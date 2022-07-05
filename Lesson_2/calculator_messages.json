@@ -1,0 +1,10 @@
+{ "first_message": "'Welcome to the Calculator'",
+  "second_message": "What is the first number?",
+  "secondmg_message": "What is the second number?",
+  "third_message": "hmm... that doesn't look like a valid number",
+  "fourth_message": "What operation would you like to perform?\n 1)Add 2)Subract 3)Multiply 4)Divide",
+  "fifth_message": "You have to enter either 1), 2), 3), or 4) only!",
+  "sixth_message": "The result is:",
+  "seventh_message": "Would you like to perform another computation? (y/n)",
+  "eight_message": "Either enter 'y' for yes or 'n' for no:"
+}
