@@ -1,22 +1,54 @@
+const TOTAL_MATCHES = 5;
 const readline = require("readline-sync");
-const VALID_CHOICES = ['r', 'p', 's', 'S', 'l'];
-
-function prompt(mgs) {
-  console.log(`\n==> ${mgs}`);
-}
+const VALID_CHOICES = ['r', 'p', 'sc', 'sp', 'l'];
+let gameCounter = 1;
 let wholeWord;
-function completeWord(word) {              //function that coverts first
-  switch (word) {                          //character of each word to the
-    case 'p':                              //respective word
+let computerWinCounter = 0;
+let playerWinCounter = 0;
+let choice;
+let computerChoice;
+const WINNING_COMBOS = {
+  r:   ['sc', 'l'],
+  p:   ['r', 'sp'],
+  sc:  ['p', 'l'],
+  sp:  ['r', 'sc'],
+  l:   ['p', 'sp'],
+};
+
+function prompt(mgs) {               //prompt function
+  console.log(`==> ${mgs}`.toUpperCase());
+}
+
+function getPlayersInput() {            //gets players input:"choice"
+  prompt(`Game ${gameCounter}:`);
+
+  prompt("Enter a choice: 'r' for rock, 'p' for paper, 's' for scissor, 'S' for spock or 'l' for lizard:");
+  choice = readline.question().toLowerCase();
+
+  while (!VALID_CHOICES.includes(choice)) {
+    prompt("Thats not a valid choice");
+    choice = readline.question().toLowerCase();
+  }
+  return choice;
+}
+
+function getComputersInput() {       //get computers random input:"computerChoice"
+  let randomIndex = Math.floor(Math.random() * VALID_CHOICES.length);
+  return VALID_CHOICES[randomIndex];
+}
+
+function completeWord(word) {   //to get respective word
+  switch (word) {
+    case 'p':
       wholeWord = 'paper';
       break;
     case 'r':
       wholeWord = 'rock';
       break;
-    case 's':
+    case 'sc':
       wholeWord = 'scissor';
       break;
-    case 'S':
+    case 'sp':
       wholeWord = 'spock';
       break;
     case 'l':
@@ -25,64 +57,59 @@ function completeWord(word) {              //function that coverts first
   }
   return wholeWord;
 }
-let computerWinCounter = 0;
-let playerWinCounter = 0;
 
-function winningCombination(player1, player2) {
-  return (player1 === 'r') && (player2 === 's') ||
-          (player1 === 'p') && (player2 === 'r') ||
-          (player1 === 's') && (player2 === 'p') ||
-          (player1 === 'r') && (player2 === 'l') ||
-          (player1 === 'l') && (player2 === 'S') ||
-          (player1 === 'l') && (player2 === 'p') ||
-          (player1 === 'S') && (player2 === 's') ||
-          (player1 === 'S') && (player2 === 'r') ||
-          (player1 === 's') && (player2 === 'l') ||
-          (player1 === 'p') && (player2 === 'S');
+function playerWins(input1, input2) {   //to determine if player wins
+  return WINNING_COMBOS[input1].includes(input2);
 }
 
-function winningLogic(choice1, choice2) {
+function winningLogic(choice1, choice2, gameCounter) { //determine winner
   if (choice1 === choice2) {
-    prompt ("It's a tie!");
-  } else if (winningCombination(choice1, choice2)) {
-    prompt (`You win!`);
+    prompt (`Game ${gameCounter} is a tie!`);
+  } else if (playerWins(choice1, choice2)) {
+    prompt (`You win Game: ${gameCounter}!`);
     playerWinCounter += 1;
   } else {
-    prompt (`Computer wins!`);
+    prompt (`Computer wins Game: ${gameCounter}!`);
     computerWinCounter += 1;
   }
 }
 
-function chooseWinner(playerScore, computerScore) {   //function thats decides
-  if (playerScore > computerScore) {                  //the winner of 5 Games
-    prompt( " You won the best of 5 Games <==");
+function chooseWinner(playerScore, computerScore) {//determine winner of 5 games
+  if (playerScore > computerScore) {
+    prompt( "\n\n\n ==> You won the best of 5 Games <==\n\n");
   } else if (playerScore < computerScore) {
-    prompt(" Computer won the best of 5 Games <==");
+    prompt("\n\n\n ==> Computer won the best of 5 Games <==\n\n");
   } else {
-    prompt(` The game is a tie! <==`);
+    prompt(`\n\n\n ==> The game is a tie! <==\n\n`);
   }
 }
 
+
 prompt('"ROCK PAPER SCISSOR SPOCK LIZARD"');
-prompt('Lets play a best of five!');
 
-for (let counter = 1; counter <= 5; counter += 1) {    //to run the game 5 times
-  prompt(`Game ${counter}:`);
-  prompt("Enter a choice: 'r' for rock, 'p' for paper, 's' for scissor, 'S' for spock or 'l' for lizard:");
-  let choice = readline.question();
+prompt("The rules of the game are:\n *rock* crushes lizard & scissor \n *lizard* poisons spock & eats paper \n *spock* smashes scissor & vaporises rock \n *scissor* cuts paper & decapitates lizard \n *paper* disapproves spock & cover rock");
+prompt(`Lets play a best of "${TOTAL_MATCHES}" Games!`);
 
-  while (!VALID_CHOICES.includes(choice)) {        //confirms that input is valid
-    prompt("Thats not a valid choice");
-    choice = readline.question();
-  }
-  let randomIndex = Math.floor(Math.random() * VALID_CHOICES.length);
-  let computerChoice = VALID_CHOICES[randomIndex];
 
-  winningLogic(choice, computerChoice);
+for (gameCounter = 1; gameCounter <= TOTAL_MATCHES; gameCounter += 1) {
+
+  choice = getPlayersInput();
+  computerChoice = getComputersInput();
+  winningLogic(choice, computerChoice, gameCounter);
   choice = completeWord(choice);
   computerChoice = completeWord(computerChoice);
+  prompt (`You chose ${choice}, while the computer chose ${computerChoice}`);
 
-  prompt(` You chose: ${choice}, Computer chose: ${computerChoice}`);
+  if (gameCounter === TOTAL_MATCHES) {
+    continue;
+  }  else {
+    prompt(`Press any key to continue to Game: ${gameCounter + 1}`);
+    readline.question();
+  }
+
+  console.clear();
+  prompt(` SCORE BOARD: YOU: !|${playerWinCounter}|! COMPUTER : !|${computerWinCounter}|!`);
+
 }
 
 chooseWinner(playerWinCounter, computerWinCounter);
