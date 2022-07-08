@@ -1,14 +1,4 @@
-/*mortgage/car loan calculator
--Welcome user to calculator
--prompt the amount of loan in dollars
--prompt APR in years
--prompt loan duration
--calculate loan duration in months
--calculate monthly interest rate
--use formula to compute monthly payment
--edge cases: invalid input; zero APR; downpayment; (yearly/weekly/monthly
-/biyearly/quarterly payment; percentage is a negative number)
-*/
+const TOTAL_MONTHS = 12;
 const readline = require('readline-sync');
 
 function prompt (input) {
@@ -27,103 +17,161 @@ function invalidNumber (number) {
   return number.trimStart() === "" || Number.isNaN(Number(number));
 }
 
-prompt('"Welcome to the loan Calculator"');
+let totalLoan;
 
-prompt("Enter the total amount of loan in $:");
-let totalLoan = readline.question();
-
-while (invalidNumber.totalLoan) {
-  prompt("Enter a valid amount:");
+function enterTotalLoan() {
+  prompt("Enter the total amount of loan in $:");
   totalLoan = readline.question();
+
+  while (invalidNumber.totalLoan) {
+    prompt("Enter a valid amount:");
+    totalLoan = readline.question();
+  }
+  return totalLoan;
 }
-print(`$${totalLoan}`);
 
-prompt("Enter the Annual Percentage Rate (%):");
-let annualPercentageRate = readline.question();
+let annualPercentageRate;
 
-while (invalidNumber(annualPercentageRate)) {
-  prompt("Enter a valid Percentage:");
+function enterAnnualPercentage() {
+  prompt("Enter the Annual Percentage Rate (%):");
   annualPercentageRate = readline.question();
-}
-print(`${annualPercentageRate}%`);
 
-prompt('Enter the time in years for the loan:');
-let loanDurationYears = readline.question();
-while (invalidNumber(totalLoan)) {
-  prompt("Enter a valid number:");
+  while (invalidNumber(annualPercentageRate)) {
+    prompt("Enter a valid Percentage:");
+    annualPercentageRate = readline.question();
+  }
+  return annualPercentageRate;
+}
+
+let loanDurationYears;
+
+function enterLoanTimePeriod() {
+  prompt('Enter the time in years for the loan:');
   loanDurationYears = readline.question();
+  while (invalidNumber(totalLoan)) {
+    prompt("Enter a valid number:");
+    loanDurationYears = readline.question();
+  }
+  return loanDurationYears;
 }
-print(`$${loanDurationYears} Years`);
 
-prompt("Enter a down payment for the loan in $:");
-let downPayment = readline.question();
-while (invalidNumber(downPayment)) {
-  prompt("Enter a valid amount:");
+let downPayment;
+
+function enterDownPayment() {
+  prompt("Enter a down payment for the loan in $:");
   downPayment = readline.question();
+  while (invalidNumber(downPayment)) {
+    prompt("Enter a valid amount:");
+    downPayment = readline.question();
+  }
+  return downPayment;
 }
-print(`$${downPayment}`);
 
-prompt("Enter payment plan:\n 0.Weekly 1.Monthly 2.Quarterly 3.Biannually 4.Yearly 5.All payment plans ");
-let plan = readline.question();
-
-while (!['0','1','2','3','4','5'].includes(plan)) {
-  prompt("Enter a valid option!");
+let plan;
+function paymentTimePlan() {
+  prompt("Enter payment plan:\n 1.Monthly 2.Quarterly 3.Biannually 4.Yearly 5.All payment plans ");
   plan = readline.question();
-}
 
-let loanDurationInMonths = loanDurationYears * 12;
+  while (!['1','2','3','4','5'].includes(plan)) {
+    prompt("Enter a valid option!");
+    plan = readline.question();
+  }
+  return plan;
+}
 
 let monthlyPayment;
 
-let monthlyInterestPercent = annualPercentageRate / 12;  //monthly interest percetage
-
-let monthlyInterestDecimal =  monthlyInterestPercent / 100;//monthly int in decimal
-
-if (downPayment) { //user enter a valid number for down payment
-
-  let loanMinusDownPayment = totalLoan - downPayment;
-  if (annualPercentageRate !== "0") {                  //case of APR with a value
-    monthlyPayment = loanMinusDownPayment * (monthlyInterestDecimal
-      / (1 - Math.pow((1 + monthlyInterestDecimal),
-        (-loanDurationInMonths))));
-  }  else  {                                     //no downpayment and APR is zero
-    monthlyPayment = loanMinusDownPayment / loanDurationInMonths;
+let payPlan;
+function rangeOfPaymentPlan (timeInput) {
+  switch (timeInput) {
+    case '1' :
+      payPlan = prompt(`The monthly payment is $${twoDecimalPlaces(monthlyPayment)}`);
+      break;
+    case '2' :
+      payPlan = prompt(`The quarterly payment is $${twoDecimalPlaces(monthlyPayment * 4)}`);
+      break;
+    case '3' :
+      payPlan = prompt(`The biannual payment is $${twoDecimalPlaces(monthlyPayment * 6)}`);
+      break;
+    case '4' :
+      payPlan = prompt(`The yearly payment is $${twoDecimalPlaces(monthlyPayment * 12)}`);
+      break;
+    case '5' :
+      payPlan = prompt(`The weekly payment is $${twoDecimalPlaces(monthlyPayment / 4)}\n` + `The monthly payment is $${twoDecimalPlaces(monthlyPayment)}\n` + `The quarterly payment is $${twoDecimalPlaces(monthlyPayment * 4)}\n` + `The biannual payment is $${twoDecimalPlaces(monthlyPayment * 6)}\n` + `The yearly payment is $${twoDecimalPlaces(monthlyPayment * 12)}`);
+      break;
   }
-}  else if (annualPercentageRate !== "0") {  //no down payment
-  monthlyPayment = totalLoan * (monthlyInterestDecimal /
-       (1 - Math.pow((1 + monthlyInterestDecimal),
-         (-loanDurationInMonths))));
-}  else  {
-  monthlyPayment = totalLoan / loanDurationInMonths;
+  return payPlan;
+}
+let calculateAgain;
+function anotherCalculation () {
+  prompt ("\n Would you like to perform another calculation? (y/n)");
+  calculateAgain = readline.question().toLowerCase();
+
+  while ( calculateAgain !== "y" && calculateAgain !== "n") {
+    prompt("Enter y or n!");
+    calculateAgain = readline.question().toLowerCase();
+  }
+  return calculateAgain;
 }
 
-let paymentPlan;
-switch (plan) {
-  case '0':
-    paymentPlan = monthlyPayment / 4;
-    prompt(`The weekly payment is $${twoDecimalPlaces(paymentPlan)}`);
-    break;
-  case '1' :
-    paymentPlan = monthlyPayment;
-    prompt(`The monthly payment is $${twoDecimalPlaces(paymentPlan)}`);
-    break;
-  case '2' :
-    paymentPlan = monthlyPayment * 4;
-    prompt(`The quarterly payment is $${twoDecimalPlaces(paymentPlan)}`);
-    break;
-  case '3' :
-    paymentPlan = monthlyPayment * 6;
-    prompt(`The biannual payment is $${twoDecimalPlaces(paymentPlan)}`);
-    break;
-  case '4' :
-    paymentPlan = monthlyPayment * 12;
-    prompt(`The yearly payment is $${twoDecimalPlaces(paymentPlan)}`);
-    break;
-  case '5' :
-    prompt(`The weekly payment is $${twoDecimalPlaces(monthlyPayment / 4)}`);
-    prompt(`The monthly payment is $${twoDecimalPlaces(monthlyPayment)}`);
-    prompt(`The quarterly payment is $${twoDecimalPlaces(monthlyPayment * 4)}`);
-    prompt(`The biannual payment is $${twoDecimalPlaces(monthlyPayment * 6)}`);
-    prompt(`The yearly payment is $${twoDecimalPlaces(monthlyPayment * 12)}`);
-    break;
+
+function loanMonths (years) {
+  return years * 12;
+}
+
+function interestPercentMonthly (apr) {
+  let monthlyInterestPercent = apr / TOTAL_MONTHS;  //monthly interest percetage
+  return monthlyInterestPercent / 100;
+}
+
+function calculateMonthlyPayment (loan, monthlyInterest, loanMonthDuration) {
+  return loan * (monthlyInterest
+  / (1 - Math.pow((1 + monthlyInterest),
+    (-loanMonthDuration))));
+}
+console.clear();
+
+prompt('"Welcome to the loan Calculator"');
+
+while (true) {
+  enterTotalLoan();
+  print(`$${totalLoan}`);
+
+  enterAnnualPercentage();
+  print(`${annualPercentageRate}%`);
+
+  enterLoanTimePeriod();
+  print(`$${loanDurationYears} Years`);
+
+  enterDownPayment();
+  print(`$${downPayment}`);
+
+  paymentTimePlan();
+
+  let loanDurationInMonths = loanMonths(loanDurationYears);
+
+  let monthlyInterestDecimal = interestPercentMonthly(annualPercentageRate);
+
+  if (downPayment) { //user enter a valid number for down payment
+
+    let loanMinusDpay = totalLoan - downPayment;
+    if (annualPercentageRate !== "0") {                  //case of APR with a value
+      monthlyPayment = calculateMonthlyPayment (loanMinusDpay,
+        monthlyInterestDecimal, loanDurationInMonths);
+    }  else  {                                     //no downpayment and APR is zero
+      monthlyPayment = loanMinusDpay / loanDurationInMonths;
+    }
+  }  else if (annualPercentageRate !== "0") {  //no down payment
+    monthlyPayment = calculateMonthlyPayment (totalLoan,
+      monthlyInterestDecimal, loanDurationInMonths);
+  }  else  {
+    monthlyPayment = totalLoan / loanDurationInMonths;
+  }
+  rangeOfPaymentPlan(plan);
+
+  anotherCalculation();
+
+  console.clear();
+
+  if (calculateAgain === "n") break;
 }

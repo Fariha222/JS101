@@ -108,7 +108,7 @@ for (gameCounter = 1; gameCounter <= TOTAL_MATCHES; gameCounter += 1) {
   }
 
   console.clear();
-  prompt(` SCORE BOARD: YOU: !|${playerWinCounter}|! COMPUTER : !|${computerWinCounter}|!`);
+  prompt(` SCOREBOARD: YOU: !|${playerWinCounter}|! COMPUTER : !|${computerWinCounter}|!`);
 
 }
 
