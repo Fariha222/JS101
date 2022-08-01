@@ -23,7 +23,7 @@ function enterTotalLoan() {
   prompt("Enter the total amount of loan in $:");
   totalLoan = readline.question();
 
-  while (invalidNumber.totalLoan) {
+  while (invalidNumber(totalLoan)) {
     prompt("Enter a valid amount:");
     totalLoan = readline.question();
   }
@@ -43,14 +43,25 @@ function enterAnnualPercentage() {
   return annualPercentageRate;
 }
 
-let loanDurationYears;
+let loanDurationYears = 0;
 
 function enterLoanTimePeriod() {
-  prompt('Enter the time in years for the loan:');
-  loanDurationYears = readline.question();
-  while (invalidNumber(totalLoan)) {
-    prompt("Enter a valid number:");
-    loanDurationYears = readline.question();
+  while (loanDurationYears === 0) {
+    prompt('Enter the time in years and months for the loan:');
+    prompt("Years:");
+    let totalYears = readline.question();
+
+    while (invalidNumber(totalYears) || totalYears.includes(".")) {
+      prompt("Enter a valid number:");
+      totalYears = readline.question();
+    }
+    prompt("Months:");
+    let totalMonths = readline.question();
+    while (invalidNumber(totalMonths) || totalMonths.includes(".")) {
+      prompt("Enter a valid number:");
+      totalMonths = readline.question();
+    }
+    loanDurationYears = Number(totalYears) + (Number(totalMonths) / 12);
   }
   return loanDurationYears;
 }
@@ -120,7 +131,7 @@ function loanMonths (years) {
 }
 
 function interestPercentMonthly (apr) {
-  let monthlyInterestPercent = apr / TOTAL_MONTHS;  //monthly interest percetage
+  let monthlyInterestPercent = apr / TOTAL_MONTHS;  //monthly interest percentage
   return monthlyInterestPercent / 100;
 }
 
@@ -141,7 +152,7 @@ while (true) {
   print(`${annualPercentageRate}%`);
 
   enterLoanTimePeriod();
-  print(`$${loanDurationYears} Years`);
+  print(`${loanDurationYears} Years`);
 
   enterDownPayment();
   print(`$${downPayment}`);
@@ -152,21 +163,14 @@ while (true) {
 
   let monthlyInterestDecimal = interestPercentMonthly(annualPercentageRate);
 
-  if (downPayment) { //user enter a valid number for down payment
-
-    let loanMinusDpay = totalLoan - downPayment;
-    if (annualPercentageRate !== "0") {                  //case of APR with a value
-      monthlyPayment = calculateMonthlyPayment (loanMinusDpay,
-        monthlyInterestDecimal, loanDurationInMonths);
-    }  else  {                                     //no downpayment and APR is zero
-      monthlyPayment = loanMinusDpay / loanDurationInMonths;
-    }
-  }  else if (annualPercentageRate !== "0") {  //no down payment
-    monthlyPayment = calculateMonthlyPayment (totalLoan,
+  let loanMinusDpay = totalLoan - downPayment;
+  if (annualPercentageRate !== "0") {                  //case of APR with a value
+    monthlyPayment = calculateMonthlyPayment (loanMinusDpay,
       monthlyInterestDecimal, loanDurationInMonths);
-  }  else  {
-    monthlyPayment = totalLoan / loanDurationInMonths;
+  }  else  {                                     //APR is zero
+    monthlyPayment = loanMinusDpay / loanDurationInMonths;
   }
+
   rangeOfPaymentPlan(plan);
 
   anotherCalculation();
